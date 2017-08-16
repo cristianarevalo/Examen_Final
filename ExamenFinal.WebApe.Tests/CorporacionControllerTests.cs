@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ExamenFinal.WebApe.Tests
 {
@@ -20,7 +21,7 @@ namespace ExamenFinal.WebApe.Tests
             _controlador = new CorporacionController(UnidadTrabajoMockeada.ObtenerUnidadDeTrabajo());
         }
 
-        [Fact(DisplayName = "[CorporacionController] Listar_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController]  Get ListarTodo")]
         public void Listar_Test()
         {
             var resultado = _controlador.ListarTodo() as OkObjectResult;
@@ -33,7 +34,7 @@ namespace ExamenFinal.WebApe.Tests
         }
 
 
-        [Fact(DisplayName = "[CorporacionController] TraerPorId_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController] Get TraerPorId")]
         public void TraerPorId_Test()
         {
             var resultado = _controlador.TraerPorId(1) as OkObjectResult;
@@ -42,55 +43,54 @@ namespace ExamenFinal.WebApe.Tests
         }
 
 
-        [Fact(DisplayName = "[CorporacionController] ListarPaginado_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController] Get ObtenerCorporacionesPaginadas")]
         public void ListarPaginado_Test()
         {
             var resultado = _controlador.ObtenerCorporacionesPaginadas(1, 10) as OkObjectResult;
 
             resultado.Should().NotBeNull();
 
-            var modelo = resultado.Value as List<Corporation>;
+            var respuesta = resultado.Value as List<Corporation>;
 
-            modelo.Count().Should().BeGreaterThan(0);
+            respuesta.Count().Should().BeGreaterThan(0);
         }
 
 
-        [Fact(DisplayName = "[CorporacionController] Insertar_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController] Post Insertar")]
         public void Insertar_Test()
         {
             Corporation corporacion = new Corporation
             {
-                Corp_Name = "Nueva corporación",
-                Street = string.Empty,
-                City = string.Empty,
-                State_Prov = string.Empty,
-                Country = string.Empty,
-                Mail_Code = string.Empty,
-                Phone_No = string.Empty,
-                Expr_Dt = DateTime.Now.AddYears(5),
-                Corp_Code = string.Empty
+                Corp_Name = "Corporación 4",
+                Street = "Jr. ",
+                City = "Caxa",
+                State_Prov = "aaa",
+                Country = "Peru",
+                Mail_Code = "aaaa@om.com",
+                Phone_No = "635456455",
+                Expr_Dt = DateTime.Now.AddYears(1),
+                Corp_Code = "01"
             };
 
             var resultado = _controlador.Insertar(corporacion) as OkObjectResult;
 
             resultado.Should().NotBeNull();
 
-            int modelo = (int)resultado.Value;
+            int respuesta = (int)resultado.Value;
 
-            modelo.Should().BeGreaterThan(0);
+            respuesta.Should().BeGreaterThan(0);
         }
 
 
-        [Fact(DisplayName = "[CorporacionController] Actualizar_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController] Put Actualizar")]
         public void Actualizar_Test()
         {
-            int corporacionPrueba = ((_controlador.ListarTodo() as OkObjectResult).Value as List<Corporation>).Max(x => x.Corp_No);
+            Corporation corporacion = (_controlador.TraerPorId(1) as OkObjectResult).Value as Corporation;
 
-            Corporation ultimaCorporacion = (_controlador.TraerPorId(corporacionPrueba) as OkObjectResult).Value as Corporation;
+            corporacion.Street = "Av. Proceres # 130";
+            corporacion.City = "Lima";
 
-            ultimaCorporacion.Corp_Name += "Actualizado";
-
-            var resultado = _controlador.Actualizar(ultimaCorporacion) as OkObjectResult;
+            var resultado = _controlador.Actualizar(corporacion) as OkObjectResult;
 
             resultado.Should().NotBeNull();
 
@@ -98,30 +98,26 @@ namespace ExamenFinal.WebApe.Tests
         }
 
 
-        [Fact(DisplayName = "[CorporacionController] Eliminar_Corporacion")]
+        [Fact(DisplayName = "[CorporacionController] Delete Eliminar")]
         public void Eliminar_Test()
         {
-            int corporacionPrueba = ((_controlador.ListarTodo() as OkObjectResult).Value as List<Corporation>).Max(x => x.Corp_No);
-
-            Corporation ultimaCorporacion = (_controlador.TraerPorId(corporacionPrueba) as OkObjectResult).Value as Corporation;
-
-            var resultado = _controlador.Eliminar(ultimaCorporacion) as OkObjectResult;
+            var resultado = _controlador.Eliminar(3) as OkObjectResult;
 
             resultado.Should().NotBeNull();
 
             resultado.Value.Should().Be(true);
         }
 
-        [Fact(DisplayName = "[CorporacionController] Contar_Registros_Corporacion")]
+
+        [Fact(DisplayName = "[CorporacionController] Get ObtenerCorporacionesPaginadas")]
         public void Contar_Registros_Test()
         {
             var resultado = _controlador.ContarRegistros() as OkObjectResult;
 
             resultado.Should().NotBeNull();
 
-            int modelo = (int)resultado.Value;
-
-            modelo.Should().BeGreaterOrEqualTo(1);
+            int respuesta = (int)resultado.Value;
+            respuesta.Should().BeGreaterOrEqualTo(3);
         }
 
     }
